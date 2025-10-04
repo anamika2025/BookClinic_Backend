@@ -17,7 +17,7 @@ namespace Book_Clinic.Data
         {
         }
 
-        public DbSet<MstClinic> MstClinics { get; set; }
+        public DbSet<MstClinic> MstClinic { get; set; }
 
         public DbSet<MstDoctor> MstDoctors { get; set; }
 

@@ -14,6 +14,7 @@ namespace Book_Clinic.Entities.Models
         public int ClinicId { get; set; }
         public string? ClinicName { get; set; }
         public string? StateName { get; set; }
+        public int CityId { get; set; }
         public string? CityName { get; set; }
         public string? ClinicAddress { get; set; }
         public int? ContactNumber { get; set; }
