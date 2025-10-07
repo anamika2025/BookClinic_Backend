@@ -29,11 +29,6 @@ public class AuthenticationController : ControllerBase
         }
     }
 
-    [HttpGet]
-    public IActionResult Test()
-    {
-        return Ok("API is working!");
-    }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)

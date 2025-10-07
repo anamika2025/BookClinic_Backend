@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Book_Clinic.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Book_Clinic_DB : Migration
+    public partial class tableupdate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -26,11 +26,64 @@ namespace Book_Clinic.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MstStates",
+                columns: table => new
+                {
+                    StateId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StateName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MstStates", x => x.StateId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetRoleClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MstCity",
+                columns: table => new
+                {
+                    CityId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CityName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StateId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MstCity", x => x.CityId);
+                    table.ForeignKey(
+                        name: "FK_MstCity_MstStates_StateId",
+                        column: x => x.StateId,
+                        principalTable: "MstStates",
+                        principalColumn: "StateId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CityId = table.Column<int>(type: "int", nullable: false),
@@ -52,6 +105,12 @@ namespace Book_Clinic.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_MstCity_CityId",
+                        column: x => x.CityId,
+                        principalTable: "MstCity",
+                        principalColumn: "CityId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -60,38 +119,27 @@ namespace Book_Clinic.Data.Migrations
                 {
                     ClinicId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ClinicName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StateName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CityName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClinicAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ContactNumber = table.Column<int>(type: "int", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OpeningTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    ClosingTime = table.Column<TimeSpan>(type: "time", nullable: false)
+                    ClinicName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClinicAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CityId = table.Column<int>(type: "int", nullable: false),
+                    StateId = table.Column<int>(type: "int", nullable: false),
+                    ContactNumber = table.Column<long>(type: "bigint", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MstClinics", x => x.ClinicId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetRoleClaims",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "AspNetRoles",
-                        principalColumn: "Id",
+                        name: "FK_MstClinics_MstCity_CityId",
+                        column: x => x.CityId,
+                        principalTable: "MstCity",
+                        principalColumn: "CityId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MstClinics_MstStates_StateId",
+                        column: x => x.StateId,
+                        principalTable: "MstStates",
+                        principalColumn: "StateId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -181,16 +229,38 @@ namespace Book_Clinic.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MstClinicTimings",
+                columns: table => new
+                {
+                    ClinicTimingId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClinicId = table.Column<int>(type: "int", nullable: false),
+                    DayOfWeek = table.Column<int>(type: "int", nullable: false),
+                    OpeningTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    ClosingTime = table.Column<TimeSpan>(type: "time", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MstClinicTimings", x => x.ClinicTimingId);
+                    table.ForeignKey(
+                        name: "FK_MstClinicTimings_MstClinics_ClinicId",
+                        column: x => x.ClinicId,
+                        principalTable: "MstClinics",
+                        principalColumn: "ClinicId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MstDoctors",
                 columns: table => new
                 {
                     DoctorId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DoctorName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CityId = table.Column<int>(type: "int", nullable: true),
                     CareSpecialization = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClinicId = table.Column<int>(type: "int", nullable: false)
+                    ClinicId = table.Column<int>(type: "int", nullable: false),
+                    CityId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -210,29 +280,51 @@ namespace Book_Clinic.Data.Migrations
                     AppointmentId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DoctorId = table.Column<int>(type: "int", nullable: false),
-                    CityId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClinicId = table.Column<int>(type: "int", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MstUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MstAppointments", x => x.AppointmentId);
                     table.ForeignKey(
-                        name: "FK_MstAppointments_AspNetUsers_MstUserId",
-                        column: x => x.MstUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_MstAppointments_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MstAppointments_MstClinics_ClinicId",
+                        column: x => x.ClinicId,
+                        principalTable: "MstClinics",
+                        principalColumn: "ClinicId",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_MstAppointments_MstDoctors_DoctorId",
+                        column: x => x.DoctorId,
+                        principalTable: "MstDoctors",
+                        principalColumn: "DoctorId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MstDoctorSlots",
+                columns: table => new
+                {
+                    SlotId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DoctorId = table.Column<int>(type: "int", nullable: false),
+                    DayOfWeek = table.Column<int>(type: "int", nullable: false),
+                    FromTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    ToTime = table.Column<TimeSpan>(type: "time", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MstDoctorSlots", x => x.SlotId);
+                    table.ForeignKey(
+                        name: "FK_MstDoctorSlots_MstDoctors_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "MstDoctors",
                         principalColumn: "DoctorId",
@@ -272,6 +364,11 @@ namespace Book_Clinic.Data.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_CityId",
+                table: "AspNetUsers",
+                column: "CityId");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -279,14 +376,14 @@ namespace Book_Clinic.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MstAppointments_ClinicId",
+                table: "MstAppointments",
+                column: "ClinicId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MstAppointments_DoctorId",
                 table: "MstAppointments",
                 column: "DoctorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MstAppointments_MstUserId",
-                table: "MstAppointments",
-                column: "MstUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MstAppointments_UserId",
@@ -294,9 +391,34 @@ namespace Book_Clinic.Data.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MstCity_StateId",
+                table: "MstCity",
+                column: "StateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MstClinics_CityId",
+                table: "MstClinics",
+                column: "CityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MstClinics_StateId",
+                table: "MstClinics",
+                column: "StateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MstClinicTimings_ClinicId",
+                table: "MstClinicTimings",
+                column: "ClinicId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MstDoctors_ClinicId",
                 table: "MstDoctors",
                 column: "ClinicId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MstDoctorSlots_DoctorId",
+                table: "MstDoctorSlots",
+                column: "DoctorId");
         }
 
         /// <inheritdoc />
@@ -321,6 +443,12 @@ namespace Book_Clinic.Data.Migrations
                 name: "MstAppointments");
 
             migrationBuilder.DropTable(
+                name: "MstClinicTimings");
+
+            migrationBuilder.DropTable(
+                name: "MstDoctorSlots");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
@@ -331,6 +459,12 @@ namespace Book_Clinic.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "MstClinics");
+
+            migrationBuilder.DropTable(
+                name: "MstCity");
+
+            migrationBuilder.DropTable(
+                name: "MstStates");
         }
     }
 }

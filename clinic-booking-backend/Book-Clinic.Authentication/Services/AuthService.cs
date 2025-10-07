@@ -25,7 +25,7 @@ public class AuthService: IAuthService
     {
         var user = new MstUser
         {
-            UserId = request.UserId,
+            //UserId = request.UserId,
             UserName = request.UserName,
             Email = request.Email,
             CityId = request.CityId,

@@ -17,20 +17,17 @@ namespace Book_Clinic.Controllers
         }
 
 
-        [HttpGet]
-        public async Task<IActionResult> GetClinics([FromQuery] int cityId)
+        [HttpGet("api/clinics")]
+        public async Task<IActionResult> GetClinicsByCity([FromQuery] int cityId)
         {
-            var clinics = await _context.MstClinic
+            var clinics = await _context.MstClinics
                 .Where(c => c.CityId == cityId)
-                .Select(c => new
-                {
-                    ClinicID = c.ClinicId,  
-                    ClinicName = c.ClinicName
-                })
+                .Select(c => new { c.ClinicId, c.ClinicName })
                 .ToListAsync();
 
             return Ok(clinics);
         }
+
 
 
 

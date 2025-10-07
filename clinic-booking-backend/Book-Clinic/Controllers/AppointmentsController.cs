@@ -17,48 +17,50 @@ namespace Book_Clinic.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAppointments([FromQuery] int? doctorId, [FromQuery] int? clinicId, [FromQuery] int? cityId)
-        {
-            var query = _context.MstAppointments
-                .Include(a => a.Doctor)
-                    .ThenInclude(d => d.Clinic)
-                .Include(a => a.User)
-                .AsQueryable();
 
-            if (doctorId.HasValue) query = query.Where(a => a.DoctorId == doctorId.Value);
-            if (clinicId.HasValue) query = query.Where(a => a.Doctor.ClinicId == clinicId.Value);
-            if (cityId.HasValue) query = query.Where(a => a.CityId == cityId.Value);
-
-            var appointments = await query
-                .Select(a => new
-                {
-                    AppointmentID = a.AppointmentId,
-                    DoctorName = a.Doctor.DoctorName,
-                    ClinicName = a.Doctor.Clinic.ClinicName,
-                    AppointmentDate = a.StartTime.Date,
-                    StartTime = a.StartTime.ToString("HH:mm"),
-                    EndTime = a.EndTime.ToString("HH:mm"),
-                    Status = a.Status
-                })
-                .ToListAsync();
-
-            return Ok(appointments);
-        }
-    
-
-    [HttpPost]
+        [HttpPost("api/appointments")]
         public async Task<IActionResult> CreateAppointment([FromBody] MstAppointment appointment)
         {
             appointment.Status = "Booked";
+
             _context.MstAppointments.Add(appointment);
             await _context.SaveChangesAsync();
+
             return Ok(new { message = "Appointment booked successfully" });
         }
 
+        [HttpGet("{clinicId}/{doctorId}")]
+        public async Task<ActionResult<IEnumerable<MstAppointment>>> GetAppointments(int clinicId, int doctorId)
+        {
+            return await _context.MstAppointments
+                .Where(a => a.ClinicId == clinicId && a.DoctorId == doctorId)
+                .Include(a => a.Doctor)
+                .Include(a => a.User)
+                .ToListAsync();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAppointment(int id, MstAppointment appointment)
+        {
+            if (id != appointment.AppointmentId) return BadRequest();
+            _context.Entry(appointment).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAppointment(int id)
+        {
+            var appointment = await _context.MstAppointments.FindAsync(id);
+            if (appointment == null) return NotFound();
+            _context.MstAppointments.Remove(appointment);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
 
 
 
     }
+
 
 }

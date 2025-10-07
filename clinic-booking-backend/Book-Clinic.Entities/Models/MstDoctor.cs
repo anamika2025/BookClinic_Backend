@@ -12,12 +12,12 @@ namespace Book_Clinic.Entities.Models
         [Key]
         public int DoctorId { get; set; }
         public string? DoctorName { get; set; }
-        public int? CityId { get; set; }
         public string? CareSpecialization { get; set; }
         public string? Status { get; set; }
-        // Foreign key for Clinic
         public int ClinicId { get; set; }
+        public int CityId { get; set; }
         public MstClinic? Clinic { get; set; }
         public ICollection<MstAppointment>? Appointments { get; set; }
+        public ICollection<MstDoctorSlot> WorkingSlots { get; set; }
     }
 }

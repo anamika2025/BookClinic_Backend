@@ -12,15 +12,23 @@ namespace Book_Clinic.Entities.Models
     {
         [Key]
         public int ClinicId { get; set; }
-        public string? ClinicName { get; set; }
-        public string? StateName { get; set; }
+
+        [Required]
+        public string ClinicName { get; set; }
+        public string ClinicAddress { get; set; }
+
         public int CityId { get; set; }
-        public string? CityName { get; set; }
-        public string? ClinicAddress { get; set; }
-        public int? ContactNumber { get; set; }
-        public string? Status { get; set; }
-        public TimeSpan OpeningTime { get; set; }
-        public TimeSpan ClosingTime { get; set; }
-        public ICollection<MstDoctor>? Doctors { get; set; }
+        public MstCity City { get; set; }
+
+        public int StateId { get; set; }
+        public MstState State { get; set; }
+
+        public long? ContactNumber { get; set; }
+        public string Status { get; set; }
+
+        public ICollection<MstDoctor> Doctors { get; set; }
+        public ICollection<MstAppointment> Appointments { get; set; }
+
+        public ICollection<MstClinicTiming> Timings { get; set; }
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Book_Clinic.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250930051422_Book_Clinic_DB")]
-    partial class Book_Clinic_DB
+    [Migration("20251007084954_table-update")]
+    partial class tableupdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,7 +33,7 @@ namespace Book_Clinic.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AppointmentId"));
 
-                    b.Property<int>("CityId")
+                    b.Property<int?>("ClinicId")
                         .HasColumnType("int");
 
                     b.Property<int>("DoctorId")
@@ -42,28 +42,47 @@ namespace Book_Clinic.Data.Migrations
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("MstUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("AppointmentId");
 
-                    b.HasIndex("DoctorId");
+                    b.HasIndex("ClinicId");
 
-                    b.HasIndex("MstUserId");
+                    b.HasIndex("DoctorId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("MstAppointments");
+                });
+
+            modelBuilder.Entity("Book_Clinic.Entities.Models.MstCity", b =>
+                {
+                    b.Property<int>("CityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CityId"));
+
+                    b.Property<string>("CityName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StateId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CityId");
+
+                    b.HasIndex("StateId");
+
+                    b.ToTable("MstCity");
                 });
 
             modelBuilder.Entity("Book_Clinic.Entities.Models.MstClinic", b =>
@@ -74,33 +93,61 @@ namespace Book_Clinic.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClinicId"));
 
-                    b.Property<string>("CityName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CityId")
+                        .HasColumnType("int");
 
                     b.Property<string>("ClinicAddress")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClinicName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("ContactNumber")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("StateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ClinicId");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("StateId");
+
+                    b.ToTable("MstClinics");
+                });
+
+            modelBuilder.Entity("Book_Clinic.Entities.Models.MstClinicTiming", b =>
+                {
+                    b.Property<int>("ClinicTimingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClinicTimingId"));
+
+                    b.Property<int>("ClinicId")
+                        .HasColumnType("int");
 
                     b.Property<TimeSpan>("ClosingTime")
                         .HasColumnType("time");
 
-                    b.Property<int?>("ContactNumber")
+                    b.Property<int>("DayOfWeek")
                         .HasColumnType("int");
 
                     b.Property<TimeSpan>("OpeningTime")
                         .HasColumnType("time");
 
-                    b.Property<string>("StateName")
-                        .HasColumnType("nvarchar(max)");
+                    b.HasKey("ClinicTimingId");
 
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                    b.HasIndex("ClinicId");
 
-                    b.HasKey("ClinicId");
-
-                    b.ToTable("MstClinics");
+                    b.ToTable("MstClinicTimings");
                 });
 
             modelBuilder.Entity("Book_Clinic.Entities.Models.MstDoctor", b =>
@@ -114,7 +161,7 @@ namespace Book_Clinic.Data.Migrations
                     b.Property<string>("CareSpecialization")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("CityId")
+                    b.Property<int>("CityId")
                         .HasColumnType("int");
 
                     b.Property<int>("ClinicId")
@@ -131,6 +178,50 @@ namespace Book_Clinic.Data.Migrations
                     b.HasIndex("ClinicId");
 
                     b.ToTable("MstDoctors");
+                });
+
+            modelBuilder.Entity("Book_Clinic.Entities.Models.MstDoctorSlot", b =>
+                {
+                    b.Property<int>("SlotId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SlotId"));
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DoctorId")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan>("FromTime")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("ToTime")
+                        .HasColumnType("time");
+
+                    b.HasKey("SlotId");
+
+                    b.HasIndex("DoctorId");
+
+                    b.ToTable("MstDoctorSlots");
+                });
+
+            modelBuilder.Entity("Book_Clinic.Entities.Models.MstState", b =>
+                {
+                    b.Property<int>("StateId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StateId"));
+
+                    b.Property<string>("StateName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("StateId");
+
+                    b.ToTable("MstStates");
                 });
 
             modelBuilder.Entity("Book_Clinic.Entities.Models.MstUser", b =>
@@ -190,14 +281,13 @@ namespace Book_Clinic.Data.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CityId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -345,25 +435,68 @@ namespace Book_Clinic.Data.Migrations
 
             modelBuilder.Entity("Book_Clinic.Entities.Models.MstAppointment", b =>
                 {
+                    b.HasOne("Book_Clinic.Entities.Models.MstClinic", "Clinic")
+                        .WithMany("Appointments")
+                        .HasForeignKey("ClinicId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Book_Clinic.Entities.Models.MstDoctor", "Doctor")
                         .WithMany("Appointments")
                         .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("Book_Clinic.Entities.Models.MstUser", null)
-                        .WithMany("Appointments")
-                        .HasForeignKey("MstUserId");
 
                     b.HasOne("Book_Clinic.Entities.Models.MstUser", "User")
-                        .WithMany()
+                        .WithMany("Appointments")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Clinic");
 
                     b.Navigation("Doctor");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Book_Clinic.Entities.Models.MstCity", b =>
+                {
+                    b.HasOne("Book_Clinic.Entities.Models.MstState", "State")
+                        .WithMany("Cities")
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("State");
+                });
+
+            modelBuilder.Entity("Book_Clinic.Entities.Models.MstClinic", b =>
+                {
+                    b.HasOne("Book_Clinic.Entities.Models.MstCity", "City")
+                        .WithMany("Clinics")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Book_Clinic.Entities.Models.MstState", "State")
+                        .WithMany()
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
+
+                    b.Navigation("State");
+                });
+
+            modelBuilder.Entity("Book_Clinic.Entities.Models.MstClinicTiming", b =>
+                {
+                    b.HasOne("Book_Clinic.Entities.Models.MstClinic", "Clinic")
+                        .WithMany("Timings")
+                        .HasForeignKey("ClinicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Clinic");
                 });
 
             modelBuilder.Entity("Book_Clinic.Entities.Models.MstDoctor", b =>
@@ -375,6 +508,28 @@ namespace Book_Clinic.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Clinic");
+                });
+
+            modelBuilder.Entity("Book_Clinic.Entities.Models.MstDoctorSlot", b =>
+                {
+                    b.HasOne("Book_Clinic.Entities.Models.MstDoctor", "Doctor")
+                        .WithMany("WorkingSlots")
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+                });
+
+            modelBuilder.Entity("Book_Clinic.Entities.Models.MstUser", b =>
+                {
+                    b.HasOne("Book_Clinic.Entities.Models.MstCity", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -428,14 +583,30 @@ namespace Book_Clinic.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Book_Clinic.Entities.Models.MstCity", b =>
+                {
+                    b.Navigation("Clinics");
+                });
+
             modelBuilder.Entity("Book_Clinic.Entities.Models.MstClinic", b =>
                 {
+                    b.Navigation("Appointments");
+
                     b.Navigation("Doctors");
+
+                    b.Navigation("Timings");
                 });
 
             modelBuilder.Entity("Book_Clinic.Entities.Models.MstDoctor", b =>
                 {
                     b.Navigation("Appointments");
+
+                    b.Navigation("WorkingSlots");
+                });
+
+            modelBuilder.Entity("Book_Clinic.Entities.Models.MstState", b =>
+                {
+                    b.Navigation("Cities");
                 });
 
             modelBuilder.Entity("Book_Clinic.Entities.Models.MstUser", b =>
