@@ -1,5 +1,6 @@
 ﻿using Book_Clinic.Data;
 using Book_Clinic.Entities.Models;
+using Book_Clinic.Repository.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +12,12 @@ namespace Book_Clinic.Controllers
     public class ClinicTimingsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICrudRepository<MstClinicTiming> _clinicRepo;
 
-        public ClinicTimingsController(ApplicationDbContext context)
+        public ClinicTimingsController(ApplicationDbContext context, ICrudRepository<MstClinicTiming> clinicRepo)
         {
             _context = context;
+            _clinicRepo = clinicRepo;
         }
 
         [HttpGet("{clinicId}")]
@@ -25,33 +28,35 @@ namespace Book_Clinic.Controllers
                 .ToListAsync();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddTiming(MstClinicTiming timing)
+        [HttpGet]
+        public async Task<IActionResult> GetAll() => Ok(await _clinicRepo.GetAllAsync());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            _context.MstClinicTimings.Add(timing);
-            await _context.SaveChangesAsync();
-            return Ok(timing);
+            var clinic = await _clinicRepo.GetByIdAsync(id);
+            return clinic == null ? NotFound() : Ok(clinic);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Add(MstClinicTiming clinic)
+        {
+            var created = await _clinicRepo.AddAsync(clinic);
+            return CreatedAtAction(nameof(GetById), new { id = created.ClinicId }, created);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTiming(int id, MstClinicTiming timing)
+        public async Task<IActionResult> Update(int id, MstClinicTiming clinic)
         {
-            if (id != timing.ClinicTimingId)
-                return BadRequest();
-
-            _context.Entry(timing).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            if (id != clinic.ClinicId) return BadRequest();
+            await _clinicRepo.UpdateAsync(clinic);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTiming(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var timing = await _context.MstClinicTimings.FindAsync(id);
-            if (timing == null) return NotFound();
-
-            _context.MstClinicTimings.Remove(timing);
-            await _context.SaveChangesAsync();
+            await _clinicRepo.DeleteAsync(id);
             return NoContent();
         }
 

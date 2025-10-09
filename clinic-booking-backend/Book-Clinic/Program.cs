@@ -2,6 +2,8 @@ using Book_Clinic.Authentication.Services;
 using Book_Clinic.Authentication.Utilities;
 using Book_Clinic.Data;
 using Book_Clinic.Entities.Models;
+using Book_Clinic.Repository.IRepository;
+using Book_Clinic.Repository.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +18,8 @@ builder.Services.AddSwaggerGen();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped(typeof(ICrudRepository<>), typeof(CrudRepository<>));
+builder.Services.AddScoped<AppointmentService>();
 builder.Services.AddScoped<JwtTokenGenerator>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

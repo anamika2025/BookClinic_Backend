@@ -1,5 +1,7 @@
 ﻿using Book_Clinic.Data;
 using Book_Clinic.Entities.Models;
+using Book_Clinic.Repository.IRepository;
+using Book_Clinic.Repository.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,95 +12,57 @@ namespace Book_Clinic.Controllers
     [ApiController]
     public class ClinicsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICrudRepository<MstClinic> _clinicRepo;
 
-        public ClinicsController(ApplicationDbContext context)
+        public ClinicsController(ICrudRepository<MstClinic> clinicRepo)
         {
-            _context = context;
+            _clinicRepo = clinicRepo;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAll() => Ok(await _clinicRepo.GetAllAsync());
 
-        [HttpGet("api/clinics")]
-        public async Task<IActionResult> GetClinicsByCity([FromQuery] int cityId)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            var clinics = await _context.MstClinics
-                .Where(c => c.CityId == cityId)
-                .Select(c => new { c.ClinicId, c.ClinicName })
-                .ToListAsync();
-
-            return Ok(clinics);
+            var clinic = await _clinicRepo.GetByIdAsync(id);
+            return clinic == null ? NotFound() : Ok(clinic);
         }
 
-        [HttpGet("api/clinics/{id}")]
-        public async Task<IActionResult> GetClinicById(int id)
+        [HttpPost]
+        public async Task<IActionResult> Add(MstClinic clinic)
         {
-            var clinic = await _context.MstClinics
-                .Include(c => c.City)
-                .Include(c => c.State)
-                .Include(c => c.Doctors)
-                .Include(c => c.Timings)
-                .FirstOrDefaultAsync(c => c.ClinicId == id);
-
-            if (clinic == null) return NotFound();
-
-            return Ok(clinic);
+            var created = await _clinicRepo.AddAsync(clinic);
+            return CreatedAtAction(nameof(GetById), new { id = created.ClinicId }, created);
         }
 
-        [HttpPost("api/clinics")]
-        public async Task<IActionResult> CreateClinic([FromBody] MstClinic clinic)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, MstClinic clinic)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            _context.MstClinics.Add(clinic);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetClinicById), new { id = clinic.ClinicId }, clinic);
-        }
-
-
-        [HttpPut("api/clinics/{id}")]
-        public async Task<IActionResult> UpdateClinic(int id, [FromBody] MstClinic clinic)
-        {
-            if (id != clinic.ClinicId)
-                return BadRequest("Clinic ID mismatch.");
-
-            var existingClinic = await _context.MstClinics.FindAsync(id);
-            if (existingClinic == null)
-                return NotFound();
-
-            existingClinic.ClinicName = clinic.ClinicName;
-            existingClinic.ClinicAddress = clinic.ClinicAddress;
-            existingClinic.CityId = clinic.CityId;
-            existingClinic.StateId = clinic.StateId;
-            existingClinic.ContactNumber = clinic.ContactNumber;
-            existingClinic.Status = clinic.Status;
-
-            await _context.SaveChangesAsync();
-
+            if (id != clinic.ClinicId) return BadRequest();
+            await _clinicRepo.UpdateAsync(clinic);
             return NoContent();
         }
 
-
-
-
-        [HttpDelete("api/clinics/{id}")]
-        public async Task<IActionResult> DeleteClinic(int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            var clinic = await _context.MstClinics.FindAsync(id);
-            if (clinic == null)
-                return NotFound();
-
-            _context.MstClinics.Remove(clinic);
-            await _context.SaveChangesAsync();
-
+            await _clinicRepo.DeleteAsync(id);
             return NoContent();
         }
+
+        //[HttpGet("api/clinics")]
+        //public async Task<IActionResult> GetClinicsByCity([FromQuery] int cityId)
+        //{
+        //    var clinics = await _clinicRepo.MstClinic
+        //        .Where(c => c.CityId == cityId)
+        //        .Select(c => new { c.ClinicId, c.ClinicName })
+        //        .ToListAsync();
+
+        //    return Ok(clinics);
+        //}
 
         
-
-
-
 
     }
 }
