@@ -17,7 +17,7 @@ namespace Book_Clinic.Controllers
             _context = context;
         }
 
-        [HttpGet("api/cities")]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<MstCity>>> GetCities()
         {
             return await _context.MstCity.ToListAsync();

@@ -29,7 +29,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddIdentity<MstUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5174") // Allow your frontend origin
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials(); // If you need to send cookies or auth headers
+    });
+});
 
 var app = builder.Build();
 
@@ -49,7 +58,7 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
-
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 
