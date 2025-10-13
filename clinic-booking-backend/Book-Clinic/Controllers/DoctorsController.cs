@@ -13,12 +13,12 @@ namespace Book_Clinic.Controllers
     public class DoctorsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly ICrudRepository<MstDoctor> _clinicRepo;
+        private readonly ICrudRepository<MstDoctor> _doctorRepo;
 
-        public DoctorsController(ApplicationDbContext context, ICrudRepository<MstDoctor> clinicRepo)
+        public DoctorsController(ApplicationDbContext context, ICrudRepository<MstDoctor> doctorRepo)
         {
             _context = context;
-            _clinicRepo = clinicRepo;
+            _doctorRepo = doctorRepo;
         }
 
 
@@ -33,52 +33,78 @@ namespace Book_Clinic.Controllers
             return Ok(doctors);
         }
 
-        //[HttpPost("api/doctors/register")]
-        //public async Task<IActionResult> RegisterDoctor([FromBody] DoctorRegistrationDto doctorDto)
-        //{
-        //    var doctor = new MstDoctor
-        //    {
-        //        DoctorName = doctorDto.Name,
-        //        CareSpecialization = doctorDto.Specialization,
-        //        CityId = doctorDto.CityId,
-        //        ClinicId = doctorDto.ClinicId,
-        //    };
-
-        //    _context.MstDoctors.Add(doctor);
-        //    await _context.SaveChangesAsync();
-
-        //    return Ok(new { message = "Doctor registered successfully" });
-        //}
-
         [HttpGet]
-        public async Task<IActionResult> GetAll() => Ok(await _clinicRepo.GetAllAsync());
+        public async Task<IActionResult> GetAll() => Ok(await _doctorRepo.GetAllAsync());
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var clinic = await _clinicRepo.GetByIdAsync(id);
-            return clinic == null ? NotFound() : Ok(clinic);
+            var doctor = await _doctorRepo.GetByIdAsync(id);
+            return doctor == null ? NotFound() : Ok(doctor);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(MstDoctor mstDoctor)
+        public async Task<IActionResult> Add(DoctorDto dto)
         {
-            var created = await _clinicRepo.AddAsync(mstDoctor);
+            if (dto.ClinicId == null || dto.CityId == null)
+                return BadRequest("ClinicId and CityId are required.");
+
+            var cityExists = await _context.MstCity.AnyAsync(c => c.CityId == dto.CityId.Value);
+            if (!cityExists)
+                return BadRequest($"Invalid CityId: {dto.CityId}");
+
+            var clinicExists = await _context.MstClinics.AnyAsync(c => c.ClinicId == dto.ClinicId.Value);
+            if (!clinicExists)
+                return BadRequest($"Invalid ClinicId: {dto.ClinicId}");
+
+            var doctor = new MstDoctor
+            {
+                DoctorName = dto.DoctorName,
+                CareSpecialization = dto.CareSpecialization,
+                CityId = dto.CityId.Value,
+                ClinicId = dto.ClinicId.Value,
+                Status = dto.Status
+            };
+
+            var created = await _doctorRepo.AddAsync(doctor);
+
             return CreatedAtAction(nameof(GetById), new { id = created.DoctorId }, created);
         }
 
+
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, MstDoctor mstDoctor)
+        public async Task<IActionResult> Update(int id, DoctorDto dto)
         {
-            if (id != mstDoctor.DoctorId) return BadRequest();
-            await _clinicRepo.UpdateAsync(mstDoctor);
+            if (id != dto.DoctorId)
+                return BadRequest("Mismatched DoctorId");
+
+            var existing = await _doctorRepo.GetByIdAsync(id);
+            if (existing == null)
+                return NotFound();
+
+            if (dto.ClinicId == null || dto.CityId == null)
+                return BadRequest("ClinicId and CityId are required.");
+
+            existing.DoctorName = dto.DoctorName;
+            existing.CareSpecialization = dto.CareSpecialization;
+            existing.CityId = dto.CityId.Value;
+            existing.ClinicId = dto.ClinicId.Value;
+            existing.Status = dto.Status;
+
+            await _doctorRepo.UpdateAsync(existing);
             return NoContent();
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _clinicRepo.DeleteAsync(id);
+            var existing = await _doctorRepo.GetByIdAsync(id);
+            if (existing == null)
+                return NotFound();
+
+            await _doctorRepo.DeleteAsync(id);
             return NoContent();
         }
 

@@ -1,5 +1,6 @@
 ﻿using Book_Clinic.Data;
 using Book_Clinic.Entities.Models;
+using Book_Clinic.Entities.ViewModels;
 using Book_Clinic.Repository.IRepository;
 using Book_Clinic.Repository.Repository;
 using Microsoft.AspNetCore.Http;
@@ -13,10 +14,12 @@ namespace Book_Clinic.Controllers
     public class ClinicsController : ControllerBase
     {
         private readonly ICrudRepository<MstClinic> _clinicRepo;
+        private readonly ApplicationDbContext _context;
 
-        public ClinicsController(ICrudRepository<MstClinic> clinicRepo)
+        public ClinicsController(ICrudRepository<MstClinic> clinicRepo, ApplicationDbContext context)
         {
             _clinicRepo = clinicRepo;
+            _context = context;
         }
 
         [HttpGet]
@@ -30,19 +33,52 @@ namespace Book_Clinic.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(MstClinic clinic)
+        public async Task<IActionResult> Add(ClinicCreateDto dto)
         {
+            if (dto.CityId.HasValue)
+            {
+                var cityExists = await _context.MstCity.AnyAsync(c => c.CityId == dto.CityId.Value);
+                if (!cityExists)
+                    return BadRequest($"Invalid CityId: {dto.CityId}. City does not exist.");
+            }
+
+            var clinic = new MstClinic
+            {
+                ClinicName = dto.ClinicName,
+                ClinicAddress = dto.ClinicAddress,
+                CityId = (int)dto.CityId,
+                ContactNumber = dto.ContactNumber,
+                Status = dto.Status
+            };
+
+            if (dto.CityId.HasValue)
+                clinic.CityId = dto.CityId.Value;
+
             var created = await _clinicRepo.AddAsync(clinic);
+
             return CreatedAtAction(nameof(GetById), new { id = created.ClinicId }, created);
         }
 
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, MstClinic clinic)
+        public async Task<IActionResult> Update(int id, ClinicCreateDto clinic)
         {
             if (id != clinic.ClinicId) return BadRequest();
-            await _clinicRepo.UpdateAsync(clinic);
+
+            var existingClinic = await _clinicRepo.GetByIdAsync(id);
+            if (existingClinic == null) return NotFound();
+
+            // Map DTO to entity
+            existingClinic.ClinicName = clinic.ClinicName;
+            existingClinic.ClinicAddress = clinic.ClinicAddress;
+            existingClinic.CityId = (int)clinic.CityId;
+            existingClinic.ContactNumber = clinic.ContactNumber;
+            existingClinic.Status = clinic.Status;
+
+            await _clinicRepo.UpdateAsync(existingClinic);
             return NoContent();
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

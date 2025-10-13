@@ -20,8 +20,8 @@ namespace Book_Clinic.Entities.Models
         public int CityId { get; set; }
         public MstCity City { get; set; }
 
-        public int StateId { get; set; }
-        public MstState State { get; set; }
+        //public int StateId { get; set; }
+        //public MstState State { get; set; }
 
         public long? ContactNumber { get; set; }
         public string Status { get; set; }
