@@ -19,20 +19,20 @@ namespace Book_Clinic.Controllers
 
 
         [HttpPost("api/appointments")]
-        public async Task<IActionResult> CreateAppointment([FromBody] MstAppointment appointment)
+        public async Task<IActionResult> CreateAppointment([FromBody] Appointment appointment)
         {
             appointment.Status = "Booked";
 
-            _context.MstAppointments.Add(appointment);
+            _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Appointment booked successfully" });
         }
 
         [HttpGet("{clinicId}/{doctorId}")]
-        public async Task<ActionResult<IEnumerable<MstAppointment>>> GetAppointments(int clinicId, int doctorId)
+        public async Task<ActionResult<IEnumerable<Appointment>>> GetAppointments(int clinicId, int doctorId)
         {
-            return await _context.MstAppointments
+            return await _context.Appointments
                 .Where(a => a.ClinicId == clinicId && a.DoctorId == doctorId)
                 .Include(a => a.Doctor)
                 .Include(a => a.User)
@@ -40,7 +40,7 @@ namespace Book_Clinic.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAppointment(int id, MstAppointment appointment)
+        public async Task<IActionResult> UpdateAppointment(int id, Appointment appointment)
         {
             if (id != appointment.AppointmentId) return BadRequest();
             _context.Entry(appointment).State = EntityState.Modified;
@@ -51,9 +51,9 @@ namespace Book_Clinic.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAppointment(int id)
         {
-            var appointment = await _context.MstAppointments.FindAsync(id);
+            var appointment = await _context.Appointments.FindAsync(id);
             if (appointment == null) return NotFound();
-            _context.MstAppointments.Remove(appointment);
+            _context.Appointments.Remove(appointment);
             await _context.SaveChangesAsync();
             return NoContent();
         }

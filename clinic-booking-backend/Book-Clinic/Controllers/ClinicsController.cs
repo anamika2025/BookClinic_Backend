@@ -13,10 +13,10 @@ namespace Book_Clinic.Controllers
     [ApiController]
     public class ClinicsController : ControllerBase
     {
-        private readonly ICrudRepository<MstClinic> _clinicRepo;
+        private readonly ICrudRepository<Clinic> _clinicRepo;
         private readonly ApplicationDbContext _context;
 
-        public ClinicsController(ICrudRepository<MstClinic> clinicRepo, ApplicationDbContext context)
+        public ClinicsController(ICrudRepository<Clinic> clinicRepo, ApplicationDbContext context)
         {
             _clinicRepo = clinicRepo;
             _context = context;
@@ -37,12 +37,12 @@ namespace Book_Clinic.Controllers
         {
             if (dto.CityId.HasValue)
             {
-                var cityExists = await _context.MstCity.AnyAsync(c => c.CityId == dto.CityId.Value);
+                var cityExists = await _context.Cities.AnyAsync(c => c.CityId == dto.CityId.Value);
                 if (!cityExists)
                     return BadRequest($"Invalid CityId: {dto.CityId}. City does not exist.");
             }
 
-            var clinic = new MstClinic
+            var clinic = new Clinic
             {
                 ClinicName = dto.ClinicName,
                 ClinicAddress = dto.ClinicAddress,
@@ -90,7 +90,7 @@ namespace Book_Clinic.Controllers
         //[HttpGet("api/clinics")]
         //public async Task<IActionResult> GetClinicsByCity([FromQuery] int cityId)
         //{
-        //    var clinics = await _clinicRepo.MstClinic
+        //    var clinics = await _clinicRepo.Clinic
         //        .Where(c => c.CityId == cityId)
         //        .Select(c => new { c.ClinicId, c.ClinicName })
         //        .ToListAsync();
@@ -98,7 +98,7 @@ namespace Book_Clinic.Controllers
         //    return Ok(clinics);
         //}
 
-        
+
 
     }
 }

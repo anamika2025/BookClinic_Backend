@@ -13,9 +13,9 @@ namespace Book_Clinic.Controllers
     public class DoctorsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly ICrudRepository<MstDoctor> _doctorRepo;
+        private readonly ICrudRepository<Doctor> _doctorRepo;
 
-        public DoctorsController(ApplicationDbContext context, ICrudRepository<MstDoctor> doctorRepo)
+        public DoctorsController(ApplicationDbContext context, ICrudRepository<Doctor> doctorRepo)
         {
             _context = context;
             _doctorRepo = doctorRepo;
@@ -25,7 +25,7 @@ namespace Book_Clinic.Controllers
         [HttpGet("api/doctors")]
         public async Task<IActionResult> GetDoctors([FromQuery] int clinicId)
         {
-            var doctors = await _context.MstDoctors
+            var doctors = await _context.Doctors
                 .Where(d => d.ClinicId == clinicId)
                 .Select(d => new { d.DoctorId, d.DoctorName })
                 .ToListAsync();
@@ -49,15 +49,15 @@ namespace Book_Clinic.Controllers
             if (dto.ClinicId == null || dto.CityId == null)
                 return BadRequest("ClinicId and CityId are required.");
 
-            var cityExists = await _context.MstCity.AnyAsync(c => c.CityId == dto.CityId.Value);
+            var cityExists = await _context.Cities.AnyAsync(c => c.CityId == dto.CityId.Value);
             if (!cityExists)
                 return BadRequest($"Invalid CityId: {dto.CityId}");
 
-            var clinicExists = await _context.MstClinics.AnyAsync(c => c.ClinicId == dto.ClinicId.Value);
+            var clinicExists = await _context.Clinics.AnyAsync(c => c.ClinicId == dto.ClinicId.Value);
             if (!clinicExists)
                 return BadRequest($"Invalid ClinicId: {dto.ClinicId}");
 
-            var doctor = new MstDoctor
+            var doctor = new Doctor
             {
                 DoctorName = dto.DoctorName,
                 CareSpecialization = dto.CareSpecialization,

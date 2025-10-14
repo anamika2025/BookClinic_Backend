@@ -19,9 +19,9 @@ namespace Book_Clinic.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MstState>>> GetStates()
+        public async Task<ActionResult<IEnumerable<State>>> GetStates()
         {
-            return await _context.MstStates.ToListAsync();
+            return await _context.States.ToListAsync();
         }
     }
 }

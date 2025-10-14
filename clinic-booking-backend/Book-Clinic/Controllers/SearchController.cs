@@ -21,11 +21,11 @@ namespace Book_Clinic.Controllers
         {
             try
             {
-                var doctors = await _context.MstDoctors
+                var doctors = await _context.Doctors
                     .Where(d => EF.Functions.Like(d.DoctorName.ToLower(), $"%{query.ToLower()}%"))
                     .ToListAsync();
 
-                var clinics = await _context.MstClinics
+                var clinics = await _context.Clinics
                     .Where(c => EF.Functions.Like(c.ClinicName.ToLower(), $"%{query.ToLower()}%"))
                     .ToListAsync();
 

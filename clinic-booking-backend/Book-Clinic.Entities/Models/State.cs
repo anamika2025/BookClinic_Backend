@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Book_Clinic.Entities.Models
 {
-    public class MstState
+    public class State
     {
         [Key]
 
         public int StateId { get; set; }
         public string StateName { get; set; }
 
-        public ICollection<MstCity> Cities { get; set; }
+        public ICollection<City> Cities { get; set; }
     }
 }

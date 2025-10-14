@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System;
 
 #nullable disable
 
@@ -26,7 +26,7 @@ namespace Book_Clinic.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MstStates",
+                name: "States",
                 columns: table => new
                 {
                     StateId = table.Column<int>(type: "int", nullable: false)
@@ -35,7 +35,7 @@ namespace Book_Clinic.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MstStates", x => x.StateId);
+                    table.PrimaryKey("PK_States", x => x.StateId);
                 });
 
             migrationBuilder.CreateTable(
@@ -60,7 +60,7 @@ namespace Book_Clinic.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MstCity",
+                name: "Cities",
                 columns: table => new
                 {
                     CityId = table.Column<int>(type: "int", nullable: false)
@@ -70,11 +70,11 @@ namespace Book_Clinic.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MstCity", x => x.CityId);
+                    table.PrimaryKey("PK_Cities", x => x.CityId);
                     table.ForeignKey(
-                        name: "FK_MstCity_MstStates_StateId",
+                        name: "FK_Cities_States_StateId",
                         column: x => x.StateId,
-                        principalTable: "MstStates",
+                        principalTable: "States",
                         principalColumn: "StateId",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -106,15 +106,15 @@ namespace Book_Clinic.Data.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_MstCity_CityId",
+                        name: "FK_AspNetUsers_Cities_CityId",
                         column: x => x.CityId,
-                        principalTable: "MstCity",
+                        principalTable: "Cities",
                         principalColumn: "CityId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "MstClinics",
+                name: "Clinics",
                 columns: table => new
                 {
                     ClinicId = table.Column<int>(type: "int", nullable: false)
@@ -122,25 +122,18 @@ namespace Book_Clinic.Data.Migrations
                     ClinicName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ClinicAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CityId = table.Column<int>(type: "int", nullable: false),
-                    StateId = table.Column<int>(type: "int", nullable: false),
                     ContactNumber = table.Column<long>(type: "bigint", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MstClinics", x => x.ClinicId);
+                    table.PrimaryKey("PK_Clinics", x => x.ClinicId);
                     table.ForeignKey(
-                        name: "FK_MstClinics_MstCity_CityId",
+                        name: "FK_Clinics_Cities_CityId",
                         column: x => x.CityId,
-                        principalTable: "MstCity",
+                        principalTable: "Cities",
                         principalColumn: "CityId",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_MstClinics_MstStates_StateId",
-                        column: x => x.StateId,
-                        principalTable: "MstStates",
-                        principalColumn: "StateId",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -229,7 +222,7 @@ namespace Book_Clinic.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MstClinicTimings",
+                name: "ClinicTimings",
                 columns: table => new
                 {
                     ClinicTimingId = table.Column<int>(type: "int", nullable: false)
@@ -241,17 +234,17 @@ namespace Book_Clinic.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MstClinicTimings", x => x.ClinicTimingId);
+                    table.PrimaryKey("PK_ClinicTimings", x => x.ClinicTimingId);
                     table.ForeignKey(
-                        name: "FK_MstClinicTimings_MstClinics_ClinicId",
+                        name: "FK_ClinicTimings_Clinics_ClinicId",
                         column: x => x.ClinicId,
-                        principalTable: "MstClinics",
+                        principalTable: "Clinics",
                         principalColumn: "ClinicId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "MstDoctors",
+                name: "Doctors",
                 columns: table => new
                 {
                     DoctorId = table.Column<int>(type: "int", nullable: false)
@@ -264,17 +257,17 @@ namespace Book_Clinic.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MstDoctors", x => x.DoctorId);
+                    table.PrimaryKey("PK_Doctors", x => x.DoctorId);
                     table.ForeignKey(
-                        name: "FK_MstDoctors_MstClinics_ClinicId",
+                        name: "FK_Doctors_Clinics_ClinicId",
                         column: x => x.ClinicId,
-                        principalTable: "MstClinics",
+                        principalTable: "Clinics",
                         principalColumn: "ClinicId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "MstAppointments",
+                name: "Appointments",
                 columns: table => new
                 {
                     AppointmentId = table.Column<int>(type: "int", nullable: false)
@@ -288,29 +281,29 @@ namespace Book_Clinic.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MstAppointments", x => x.AppointmentId);
+                    table.PrimaryKey("PK_Appointments", x => x.AppointmentId);
                     table.ForeignKey(
-                        name: "FK_MstAppointments_AspNetUsers_UserId",
+                        name: "FK_Appointments_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_MstAppointments_MstClinics_ClinicId",
+                        name: "FK_Appointments_Clinics_ClinicId",
                         column: x => x.ClinicId,
-                        principalTable: "MstClinics",
+                        principalTable: "Clinics",
                         principalColumn: "ClinicId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_MstAppointments_MstDoctors_DoctorId",
+                        name: "FK_Appointments_Doctors_DoctorId",
                         column: x => x.DoctorId,
-                        principalTable: "MstDoctors",
+                        principalTable: "Doctors",
                         principalColumn: "DoctorId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "MstDoctorSlots",
+                name: "DoctorSlots",
                 columns: table => new
                 {
                     SlotId = table.Column<int>(type: "int", nullable: false)
@@ -322,14 +315,29 @@ namespace Book_Clinic.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MstDoctorSlots", x => x.SlotId);
+                    table.PrimaryKey("PK_DoctorSlots", x => x.SlotId);
                     table.ForeignKey(
-                        name: "FK_MstDoctorSlots_MstDoctors_DoctorId",
+                        name: "FK_DoctorSlots_Doctors_DoctorId",
                         column: x => x.DoctorId,
-                        principalTable: "MstDoctors",
+                        principalTable: "Doctors",
                         principalColumn: "DoctorId",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_ClinicId",
+                table: "Appointments",
+                column: "ClinicId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_DoctorId",
+                table: "Appointments",
+                column: "DoctorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_UserId",
+                table: "Appointments",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -376,54 +384,37 @@ namespace Book_Clinic.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MstAppointments_ClinicId",
-                table: "MstAppointments",
-                column: "ClinicId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MstAppointments_DoctorId",
-                table: "MstAppointments",
-                column: "DoctorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MstAppointments_UserId",
-                table: "MstAppointments",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MstCity_StateId",
-                table: "MstCity",
+                name: "IX_Cities_StateId",
+                table: "Cities",
                 column: "StateId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MstClinics_CityId",
-                table: "MstClinics",
+                name: "IX_Clinics_CityId",
+                table: "Clinics",
                 column: "CityId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MstClinics_StateId",
-                table: "MstClinics",
-                column: "StateId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MstClinicTimings_ClinicId",
-                table: "MstClinicTimings",
+                name: "IX_ClinicTimings_ClinicId",
+                table: "ClinicTimings",
                 column: "ClinicId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MstDoctors_ClinicId",
-                table: "MstDoctors",
+                name: "IX_Doctors_ClinicId",
+                table: "Doctors",
                 column: "ClinicId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MstDoctorSlots_DoctorId",
-                table: "MstDoctorSlots",
+                name: "IX_DoctorSlots_DoctorId",
+                table: "DoctorSlots",
                 column: "DoctorId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Appointments");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -440,13 +431,10 @@ namespace Book_Clinic.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "MstAppointments");
+                name: "ClinicTimings");
 
             migrationBuilder.DropTable(
-                name: "MstClinicTimings");
-
-            migrationBuilder.DropTable(
-                name: "MstDoctorSlots");
+                name: "DoctorSlots");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -455,16 +443,16 @@ namespace Book_Clinic.Data.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "MstDoctors");
+                name: "Doctors");
 
             migrationBuilder.DropTable(
-                name: "MstClinics");
+                name: "Clinics");
 
             migrationBuilder.DropTable(
-                name: "MstCity");
+                name: "Cities");
 
             migrationBuilder.DropTable(
-                name: "MstStates");
+                name: "States");
         }
     }
 }

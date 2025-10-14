@@ -13,18 +13,18 @@ namespace Book_Clinic.Controllers
     public class ClinicTimingsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly ICrudRepository<MstClinicTiming> _repo;
+        private readonly ICrudRepository<ClinicTiming> _repo;
 
-        public ClinicTimingsController(ApplicationDbContext context, ICrudRepository<MstClinicTiming> repo)
+        public ClinicTimingsController(ApplicationDbContext context, ICrudRepository<ClinicTiming> repo)
         {
             _context = context;
             _repo = repo;
         }
 
-        [HttpGet("{clinicId}")]
+        [HttpGet("clinic/{clinicId:int}")]
         public async Task<IActionResult> GetByClinic(int clinicId)
         {
-            var timings = await _context.MstClinicTimings
+            var timings = await _context.ClinicTimings
                 .Where(t => t.ClinicId == clinicId)
                 .ToListAsync();
             return Ok(timings);
@@ -40,7 +40,7 @@ namespace Book_Clinic.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var timing = await _context.MstClinicTimings
+            var timing = await _context.ClinicTimings
         .AsNoTracking()
         .FirstOrDefaultAsync(t => t.ClinicTimingId == id);
 
@@ -50,11 +50,11 @@ namespace Book_Clinic.Controllers
             return Ok(timing);
         }
 
-    
+
         [HttpPost]
         public async Task<IActionResult> Add(ClinicTimingDto dto)
         {
-            var clinicExists = await _context.MstClinics
+            var clinicExists = await _context.Clinics
                 .AnyAsync(c => c.ClinicId == dto.ClinicId && c.Status == "Active");
 
             if (!clinicExists)
@@ -63,9 +63,9 @@ namespace Book_Clinic.Controllers
             if (dto.OpeningTime >= dto.ClosingTime)
                 return BadRequest("OpeningTime must be before ClosingTime.");
 
-            var clinicTiming = new MstClinicTiming
+            var clinicTiming = new ClinicTiming
             {
-                ClinicId = dto.ClinicId,
+                ClinicId = (int)dto.ClinicId,
                 DayOfWeek = dto.DayOfWeek,
                 OpeningTime = dto.OpeningTime,
                 ClosingTime = dto.ClosingTime,
@@ -76,32 +76,30 @@ namespace Book_Clinic.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.ClinicTimingId }, created);
         }
 
-
-
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, MstClinicTiming timing)
+        public async Task<IActionResult> Update(int id, ClinicTimingDto dto)
         {
-            if (id != timing.ClinicTimingId)
+            if (id != dto.ClinicTimingId)
                 return BadRequest("Id mismatch.");
 
             var existing = await _repo.GetByIdAsync(id);
             if (existing == null)
                 return NotFound();
 
-            var clinic = await _context.MstClinics
-                .Where(c => c.ClinicId == timing.ClinicId && c.Status == "Active")
-                .FirstOrDefaultAsync();
+            var clinic = await _context.Clinics
+               .Where(c => c.ClinicId == dto.ClinicId && c.Status == "Active")
+               .FirstOrDefaultAsync();
 
             if (clinic == null)
                 return BadRequest("Invalid or inactive ClinicId.");
 
-            if (timing.OpeningTime >= timing.ClosingTime)
+            if (dto.OpeningTime >= dto.ClosingTime)
                 return BadRequest("OpeningTime must be before ClosingTime.");
 
-            existing.ClinicId = timing.ClinicId;
-            existing.DayOfWeek = timing.DayOfWeek;
-            existing.OpeningTime = timing.OpeningTime;
-            existing.ClosingTime = timing.ClosingTime;
+            existing.ClinicId = (int)dto.ClinicId;
+            existing.DayOfWeek = dto.DayOfWeek;
+            existing.OpeningTime = dto.OpeningTime;
+            existing.ClosingTime = dto.ClosingTime;
 
             await _repo.UpdateAsync(existing);
             return NoContent();

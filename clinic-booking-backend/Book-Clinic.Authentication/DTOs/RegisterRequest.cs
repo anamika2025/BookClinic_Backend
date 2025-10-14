@@ -10,6 +10,6 @@
         public string Status { get; set; }
         public int CityId { get; set; }
 
-       
+
     }
 }

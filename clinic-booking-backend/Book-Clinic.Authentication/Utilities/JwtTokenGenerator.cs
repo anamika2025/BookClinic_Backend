@@ -16,7 +16,7 @@ namespace Book_Clinic.Authentication.Utilities
             _configuration = configuration;
         }
 
-        public string GenerateToken(MstUser user)
+        public string GenerateToken(User user)
         {
             if (string.IsNullOrEmpty(user.Id) || string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.Role))
             {

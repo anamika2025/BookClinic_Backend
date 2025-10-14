@@ -7,21 +7,20 @@ using System.Threading.Tasks;
 
 namespace Book_Clinic.Entities.Models
 {
-    public class MstClinicTiming
+    public class DoctorSlot
     {
         [Key]
-        public int ClinicTimingId { get; set; }
+        public int SlotId { get; set; }
 
-        public int ClinicId { get; set; }
-        public MstClinic Clinic { get; set; }
+        public int DoctorId { get; set; }
+        public Doctor Doctor { get; set; }
 
-        [Required]
         public DayOfWeek DayOfWeek { get; set; }
 
         [Required]
-        public TimeSpan OpeningTime { get; set; }
+        public TimeSpan FromTime { get; set; }
 
         [Required]
-        public TimeSpan ClosingTime { get; set; }
+        public TimeSpan ToTime { get; set; }
     }
 }

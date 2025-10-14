@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Book_Clinic.Entities.Models;
 
-public class MstUser : IdentityUser
+public class User : IdentityUser
 {
     [Key]
     //public int UserId { get; set; }
@@ -17,10 +17,8 @@ public class MstUser : IdentityUser
 
     public int CityId { get; set; }
 
-    public MstCity City { get; set; }
+    public City City { get; set; }
 
-    public ICollection<MstAppointment>? Appointments { get; set; }
+    public ICollection<Appointment>? Appointments { get; set; }
 
 }
-
-

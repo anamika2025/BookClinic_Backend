@@ -21,7 +21,7 @@ namespace Book_Clinic.Repository.Repository
         public async Task<string> BookAppointmentAsync(int doctorId, int clinicId, DateTime startTime, DateTime endTime, string userId)
         {
             // Check if doctor is available
-            bool isBooked = await _context.MstAppointments.AnyAsync(a =>
+            bool isBooked = await _context.Appointments.AnyAsync(a =>
                 a.DoctorId == doctorId &&
                 a.Status == "Booked" &&
                 ((startTime >= a.StartTime && startTime < a.EndTime) ||
@@ -30,7 +30,7 @@ namespace Book_Clinic.Repository.Repository
             if (isBooked)
                 return "Slot already booked!";
 
-            var appointment = new MstAppointment
+            var appointment = new Appointment
             {
                 DoctorId = doctorId,
                 ClinicId = clinicId,
@@ -40,7 +40,7 @@ namespace Book_Clinic.Repository.Repository
                 Status = "Booked"
             };
 
-            _context.MstAppointments.Add(appointment);
+            _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
 
             return "Appointment booked successfully.";

@@ -22,7 +22,7 @@ namespace Book_Clinic.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstAppointment", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.Appointment", b =>
                 {
                     b.Property<int>("AppointmentId")
                         .ValueGeneratedOnAdd()
@@ -57,10 +57,10 @@ namespace Book_Clinic.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("MstAppointments");
+                    b.ToTable("Appointments");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstCity", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.City", b =>
                 {
                     b.Property<int>("CityId")
                         .ValueGeneratedOnAdd()
@@ -79,10 +79,10 @@ namespace Book_Clinic.Data.Migrations
 
                     b.HasIndex("StateId");
 
-                    b.ToTable("MstCity");
+                    b.ToTable("Cities");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstClinic", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.Clinic", b =>
                 {
                     b.Property<int>("ClinicId")
                         .ValueGeneratedOnAdd()
@@ -104,9 +104,6 @@ namespace Book_Clinic.Data.Migrations
                     b.Property<long?>("ContactNumber")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("StateId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -115,12 +112,10 @@ namespace Book_Clinic.Data.Migrations
 
                     b.HasIndex("CityId");
 
-                    b.HasIndex("StateId");
-
-                    b.ToTable("MstClinics");
+                    b.ToTable("Clinics");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstClinicTiming", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.ClinicTiming", b =>
                 {
                     b.Property<int>("ClinicTimingId")
                         .ValueGeneratedOnAdd()
@@ -144,10 +139,10 @@ namespace Book_Clinic.Data.Migrations
 
                     b.HasIndex("ClinicId");
 
-                    b.ToTable("MstClinicTimings");
+                    b.ToTable("ClinicTimings");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstDoctor", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.Doctor", b =>
                 {
                     b.Property<int>("DoctorId")
                         .ValueGeneratedOnAdd()
@@ -174,10 +169,10 @@ namespace Book_Clinic.Data.Migrations
 
                     b.HasIndex("ClinicId");
 
-                    b.ToTable("MstDoctors");
+                    b.ToTable("Doctors");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstDoctorSlot", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.DoctorSlot", b =>
                 {
                     b.Property<int>("SlotId")
                         .ValueGeneratedOnAdd()
@@ -201,10 +196,10 @@ namespace Book_Clinic.Data.Migrations
 
                     b.HasIndex("DoctorId");
 
-                    b.ToTable("MstDoctorSlots");
+                    b.ToTable("DoctorSlots");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstState", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.State", b =>
                 {
                     b.Property<int>("StateId")
                         .ValueGeneratedOnAdd()
@@ -218,10 +213,10 @@ namespace Book_Clinic.Data.Migrations
 
                     b.HasKey("StateId");
 
-                    b.ToTable("MstStates");
+                    b.ToTable("States");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstUser", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.User", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -430,20 +425,20 @@ namespace Book_Clinic.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstAppointment", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.Appointment", b =>
                 {
-                    b.HasOne("Book_Clinic.Entities.Models.MstClinic", "Clinic")
+                    b.HasOne("Book_Clinic.Entities.Models.Clinic", "Clinic")
                         .WithMany("Appointments")
                         .HasForeignKey("ClinicId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Book_Clinic.Entities.Models.MstDoctor", "Doctor")
+                    b.HasOne("Book_Clinic.Entities.Models.Doctor", "Doctor")
                         .WithMany("Appointments")
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Book_Clinic.Entities.Models.MstUser", "User")
+                    b.HasOne("Book_Clinic.Entities.Models.User", "User")
                         .WithMany("Appointments")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -455,9 +450,9 @@ namespace Book_Clinic.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstCity", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.City", b =>
                 {
-                    b.HasOne("Book_Clinic.Entities.Models.MstState", "State")
+                    b.HasOne("Book_Clinic.Entities.Models.State", "State")
                         .WithMany("Cities")
                         .HasForeignKey("StateId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -466,28 +461,20 @@ namespace Book_Clinic.Data.Migrations
                     b.Navigation("State");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstClinic", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.Clinic", b =>
                 {
-                    b.HasOne("Book_Clinic.Entities.Models.MstCity", "City")
+                    b.HasOne("Book_Clinic.Entities.Models.City", "City")
                         .WithMany("Clinics")
                         .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Book_Clinic.Entities.Models.MstState", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("City");
-
-                    b.Navigation("State");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstClinicTiming", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.ClinicTiming", b =>
                 {
-                    b.HasOne("Book_Clinic.Entities.Models.MstClinic", "Clinic")
+                    b.HasOne("Book_Clinic.Entities.Models.Clinic", "Clinic")
                         .WithMany("Timings")
                         .HasForeignKey("ClinicId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -496,9 +483,9 @@ namespace Book_Clinic.Data.Migrations
                     b.Navigation("Clinic");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstDoctor", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.Doctor", b =>
                 {
-                    b.HasOne("Book_Clinic.Entities.Models.MstClinic", "Clinic")
+                    b.HasOne("Book_Clinic.Entities.Models.Clinic", "Clinic")
                         .WithMany("Doctors")
                         .HasForeignKey("ClinicId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -507,9 +494,9 @@ namespace Book_Clinic.Data.Migrations
                     b.Navigation("Clinic");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstDoctorSlot", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.DoctorSlot", b =>
                 {
-                    b.HasOne("Book_Clinic.Entities.Models.MstDoctor", "Doctor")
+                    b.HasOne("Book_Clinic.Entities.Models.Doctor", "Doctor")
                         .WithMany("WorkingSlots")
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -518,9 +505,9 @@ namespace Book_Clinic.Data.Migrations
                     b.Navigation("Doctor");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstUser", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.User", b =>
                 {
-                    b.HasOne("Book_Clinic.Entities.Models.MstCity", "City")
+                    b.HasOne("Book_Clinic.Entities.Models.City", "City")
                         .WithMany()
                         .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -540,7 +527,7 @@ namespace Book_Clinic.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Book_Clinic.Entities.Models.MstUser", null)
+                    b.HasOne("Book_Clinic.Entities.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -549,7 +536,7 @@ namespace Book_Clinic.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Book_Clinic.Entities.Models.MstUser", null)
+                    b.HasOne("Book_Clinic.Entities.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -564,7 +551,7 @@ namespace Book_Clinic.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Book_Clinic.Entities.Models.MstUser", null)
+                    b.HasOne("Book_Clinic.Entities.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -573,19 +560,19 @@ namespace Book_Clinic.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Book_Clinic.Entities.Models.MstUser", null)
+                    b.HasOne("Book_Clinic.Entities.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstCity", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.City", b =>
                 {
                     b.Navigation("Clinics");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstClinic", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.Clinic", b =>
                 {
                     b.Navigation("Appointments");
 
@@ -594,19 +581,19 @@ namespace Book_Clinic.Data.Migrations
                     b.Navigation("Timings");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstDoctor", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.Doctor", b =>
                 {
                     b.Navigation("Appointments");
 
                     b.Navigation("WorkingSlots");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstState", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.State", b =>
                 {
                     b.Navigation("Cities");
                 });
 
-            modelBuilder.Entity("Book_Clinic.Entities.Models.MstUser", b =>
+            modelBuilder.Entity("Book_Clinic.Entities.Models.User", b =>
                 {
                     b.Navigation("Appointments");
                 });

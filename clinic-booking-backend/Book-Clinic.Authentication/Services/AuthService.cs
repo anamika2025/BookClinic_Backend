@@ -6,14 +6,14 @@ using Microsoft.Extensions.Configuration;
 
 namespace Book_Clinic.Authentication.Services;
 
-public class AuthService: IAuthService
+public class AuthService : IAuthService
 {
-    private readonly UserManager<MstUser> _userManager;
+    private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration _configuration;
     private readonly JwtTokenGenerator _jwtTokenGenerator;
 
-    public AuthService(UserManager<MstUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, JwtTokenGenerator jwtTokenGenerator)
+    public AuthService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, JwtTokenGenerator jwtTokenGenerator)
     {
         _userManager = userManager;
         _roleManager = roleManager;
@@ -23,7 +23,7 @@ public class AuthService: IAuthService
 
     public async Task<AuthResponse> RegisterUserAsync(RegisterRequest request)
     {
-        var user = new MstUser
+        var user = new User
         {
             //UserId = request.UserId,
             UserName = request.UserName,

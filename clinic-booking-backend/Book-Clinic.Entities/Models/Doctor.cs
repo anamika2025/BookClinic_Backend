@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Book_Clinic.Entities.Models
 {
-    public class MstDoctor
+    public class Doctor
     {
         [Key]
         public int DoctorId { get; set; }
@@ -16,8 +16,8 @@ namespace Book_Clinic.Entities.Models
         public string? Status { get; set; }
         public int ClinicId { get; set; }
         public int CityId { get; set; }
-        public MstClinic? Clinic { get; set; }
-        public ICollection<MstAppointment>? Appointments { get; set; }
-        public ICollection<MstDoctorSlot> WorkingSlots { get; set; }
+        public Clinic? Clinic { get; set; }
+        public ICollection<Appointment>? Appointments { get; set; }
+        public ICollection<DoctorSlot> WorkingSlots { get; set; }
     }
 }
