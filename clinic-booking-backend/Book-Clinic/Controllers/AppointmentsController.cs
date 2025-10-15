@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Book_Clinic.Controllers
 {
@@ -20,18 +21,23 @@ namespace Book_Clinic.Controllers
         }
 
 
-        [Authorize] // 🔒 Protect this endpoint
+        //[Authorize] // 🔒 Protect this endpoint
         [HttpPost]
         public async Task<IActionResult> CreateAppointment([FromBody] AppointmentRequestDto dto)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId == null)
+                return Unauthorized();
+
             var appointment = new Appointment
             {
                 DoctorId = dto.DoctorId,
                 ClinicId = dto.ClinicId,
                 StartTime = dto.StartTime,
                 EndTime = dto.EndTime,
-                UserId = dto.UserId, // optionally get from token instead
-                Status = dto.Status
+                UserId = userId, 
+                Status = dto.Status 
             };
 
             _context.Appointments.Add(appointment);
