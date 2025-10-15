@@ -1,5 +1,7 @@
 ﻿using Book_Clinic.Data;
 using Book_Clinic.Entities.Models;
+using Book_Clinic.Entities.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,16 +20,26 @@ namespace Book_Clinic.Controllers
         }
 
 
-        [HttpPost("api/appointments")]
-        public async Task<IActionResult> CreateAppointment([FromBody] Appointment appointment)
+        [Authorize] // 🔒 Protect this endpoint
+        [HttpPost]
+        public async Task<IActionResult> CreateAppointment([FromBody] AppointmentRequestDto dto)
         {
-            appointment.Status = "Booked";
+            var appointment = new Appointment
+            {
+                DoctorId = dto.DoctorId,
+                ClinicId = dto.ClinicId,
+                StartTime = dto.StartTime,
+                EndTime = dto.EndTime,
+                UserId = dto.UserId, // optionally get from token instead
+                Status = dto.Status
+            };
 
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Appointment booked successfully" });
+            return Ok(new { message = "Appointment Booked Successfully" });
         }
+
 
         [HttpGet("{clinicId}/{doctorId}")]
         public async Task<ActionResult<IEnumerable<Appointment>>> GetAppointments(int clinicId, int doctorId)

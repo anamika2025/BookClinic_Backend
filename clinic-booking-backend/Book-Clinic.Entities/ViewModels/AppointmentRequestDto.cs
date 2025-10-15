@@ -13,5 +13,6 @@ namespace Book_Clinic.Entities.ViewModels
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public string? UserId { get; set; }
+        public string Status { get; set; } = "Booked";
     }
 }

@@ -1,4 +1,4 @@
-using Book_Clinic.Authentication.Services;
+﻿using Book_Clinic.Authentication.Services;
 using Book_Clinic.Authentication.Utilities;
 using Book_Clinic.Data;
 using Book_Clinic.Entities.Models;
@@ -6,6 +6,7 @@ using Book_Clinic.Repository.IRepository;
 using Book_Clinic.Repository.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,35 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Clinic Booking API", Version = "v1" });
+
+    // 🔐 Add JWT Bearer configuration
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' followed by a space and your token.\nExample: Bearer abcdef12345",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -29,6 +58,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ClinicPolicy", policy => policy.RequireRole(Roles.Clinic));
+    options.AddPolicy("DoctorPolicy", policy => policy.RequireRole(Roles.Doctor));
+    options.AddPolicy("PatientPolicy", policy => policy.RequireRole(Roles.Patient));
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>

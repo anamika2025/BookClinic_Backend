@@ -87,6 +87,8 @@ namespace Book_Clinic.Controllers
             return NoContent();
         }
 
+
+
         //[HttpGet("api/clinics")]
         //public async Task<IActionResult> GetClinicsByCity([FromQuery] int cityId)
         //{

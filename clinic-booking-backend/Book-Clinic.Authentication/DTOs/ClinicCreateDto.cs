@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Book_Clinic.Authentication.DTOs
 {
-    internal class ClinicCreateDto
+    public class ClinicCreateDto
     {
     }
 }
