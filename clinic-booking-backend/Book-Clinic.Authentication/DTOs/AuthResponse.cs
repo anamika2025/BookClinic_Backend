@@ -9,5 +9,6 @@ namespace Book_Clinic.Authentication.DTOs
     public class AuthResponse
     {
         public string Token { get; set; }
+        public object User { get; set; }
     }
 }

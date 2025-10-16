@@ -4,9 +4,12 @@ using Book_Clinic.Data;
 using Book_Clinic.Entities.Models;
 using Book_Clinic.Repository.IRepository;
 using Book_Clinic.Repository.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,15 +50,43 @@ builder.Services.AddSwaggerGen(c =>
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<Microsoft.AspNetCore.Identity.IPasswordHasher<User>, Microsoft.AspNetCore.Identity.PasswordHasher<User>>();
 builder.Services.AddScoped(typeof(ICrudRepository<>), typeof(CrudRepository<>));
 builder.Services.AddScoped<AppointmentService>();
 builder.Services.AddScoped<JwtTokenGenerator>();
+var jwtSection = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtSection["Key"]);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSection["Issuer"],
+        ValidAudience = jwtSection["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+});
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection")));
 
 
-builder.Services.AddIdentity<User, IdentityRole>()
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+})
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 builder.Services.AddAuthorization(options =>
@@ -64,6 +95,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("DoctorPolicy", policy => policy.RequireRole(Roles.Doctor));
     options.AddPolicy("PatientPolicy", policy => policy.RequireRole(Roles.Patient));
 });
+
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>

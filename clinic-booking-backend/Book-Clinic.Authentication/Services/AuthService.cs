@@ -42,7 +42,11 @@ public class AuthService : IAuthService
 
         await _userManager.AddToRoleAsync(user, user.Role);
         var token = _jwtTokenGenerator.GenerateToken(user);
-        return new AuthResponse { Token = token };
+        return new AuthResponse
+        {
+            Token = token,
+            User = new { user.Id, user.UserName, user.Email, user.Role }
+        };
     }
 
     public async Task<AuthResponse> LoginUserAsync(LoginRequest request)
@@ -52,7 +56,11 @@ public class AuthService : IAuthService
             throw new System.Exception("Invalid credentials");
 
         var token = _jwtTokenGenerator.GenerateToken(user);
-        return new AuthResponse { Token = token };
+        return new AuthResponse
+        {
+            Token = token,
+            User = new { user.Id, user.UserName, user.Email, user.Role }
+        };
     }
 
 
