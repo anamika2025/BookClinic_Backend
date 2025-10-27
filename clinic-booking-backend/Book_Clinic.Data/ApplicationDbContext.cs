@@ -25,6 +25,8 @@ namespace Book_Clinic.Data
 
         public DbSet<Doctor> Doctors { get; set; }
 
+        public DbSet<JwtKey> JwtKeys { get; set; }
+
         public DbSet<Entities.Models.Appointment> Appointments { get; set; }
 
         public DbSet<ClinicTiming> ClinicTimings { get; set; }

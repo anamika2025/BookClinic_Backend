@@ -1,7 +1,9 @@
 ﻿using Book_Clinic.Authentication.DTOs;
 using Book_Clinic.Authentication.Utilities;
+using Book_Clinic.Data;
 using Book_Clinic.Entities.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace Book_Clinic.Authentication.Services;
@@ -12,13 +14,15 @@ public class AuthService : IAuthService
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration _configuration;
     private readonly JwtTokenGenerator _jwtTokenGenerator;
+    private readonly ApplicationDbContext _context;
 
-    public AuthService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, JwtTokenGenerator jwtTokenGenerator)
+    public AuthService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, JwtTokenGenerator jwtTokenGenerator, ApplicationDbContext context)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _configuration = configuration;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _context = context;
     }
 
     public async Task<AuthResponse> RegisterUserAsync(RegisterRequest request)
@@ -41,7 +45,7 @@ public class AuthService : IAuthService
             await _roleManager.CreateAsync(new IdentityRole(user.Role));
 
         await _userManager.AddToRoleAsync(user, user.Role);
-        var token = _jwtTokenGenerator.GenerateToken(user);
+        var token = await  _jwtTokenGenerator.GenerateToken(user);
         return new AuthResponse
         {
             Token = token,
@@ -59,13 +63,25 @@ public class AuthService : IAuthService
         if (!passwordValid)
             throw new Exception("Password incorrect for user: " + request.Email);
 
-        var token = _jwtTokenGenerator.GenerateToken(user);
+        var token = await _jwtTokenGenerator.GenerateToken(user);
         return new AuthResponse
         {
             Token = token,
             User = new { user.Id, user.UserName, user.Email, user.Role }
         };
     }
+
+
+    public Task<string> GetJwtKeyFromDbAsync()
+    {
+        var key = _context.JwtKeys
+           .Where(s => s.KeyName == "JwtKey")
+        .Select(s => s.Value)
+        .FirstOrDefaultAsync();
+
+        return key ?? throw new Exception("JWT key not found in database.");
+    }
+
 
 
 

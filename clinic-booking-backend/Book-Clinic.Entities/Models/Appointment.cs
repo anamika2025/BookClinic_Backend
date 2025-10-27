@@ -21,3 +21,5 @@ namespace Book_Clinic.Entities.Models
         public string Status { get; set; } = "Booked";
     }
 }
+
+

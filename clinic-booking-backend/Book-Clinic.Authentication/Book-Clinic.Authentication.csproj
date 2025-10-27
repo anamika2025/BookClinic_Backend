@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Book-Clinic.Entities\Book-Clinic.Entities.csproj" />
+    <ProjectReference Include="..\Book_Clinic.Data\Book_Clinic.Data.csproj" />
   </ItemGroup>
 
 </Project>
