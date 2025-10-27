@@ -52,8 +52,12 @@ public class AuthService : IAuthService
     public async Task<AuthResponse> LoginUserAsync(LoginRequest request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
-        if (user == null || !await _userManager.CheckPasswordAsync(user, request.Password))
-            throw new System.Exception("Invalid credentials");
+        if (user == null)
+            throw new Exception("User not found with email: " + request.Email);
+
+        var passwordValid = await _userManager.CheckPasswordAsync(user, request.Password);
+        if (!passwordValid)
+            throw new Exception("Password incorrect for user: " + request.Email);
 
         var token = _jwtTokenGenerator.GenerateToken(user);
         return new AuthResponse
@@ -62,6 +66,7 @@ public class AuthService : IAuthService
             User = new { user.Id, user.UserName, user.Email, user.Role }
         };
     }
+
 
 
 

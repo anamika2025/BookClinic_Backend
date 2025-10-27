@@ -21,8 +21,8 @@ namespace Book_Clinic.Controllers
         }
 
 
-        //[Authorize] // 🔒 Protect this endpoint
-        [HttpPost]
+        [Authorize]
+        [HttpPost("CreateAppointment")]
         public async Task<IActionResult> CreateAppointment([FromBody] AppointmentRequestDto dto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
