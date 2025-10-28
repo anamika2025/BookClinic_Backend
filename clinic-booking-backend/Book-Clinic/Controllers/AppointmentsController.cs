@@ -21,14 +21,16 @@ namespace Book_Clinic.Controllers
         }
 
 
-        [Authorize]
+        //[Authorize]
         [HttpPost("CreateAppointment")]
         public async Task<IActionResult> CreateAppointment([FromBody] AppointmentRequestDto dto)
         {
+            //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            //if (userId == null)
+            //    return Unauthorized();
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (userId == null)
-                return Unauthorized();
 
             var appointment = new Appointment
             {
@@ -75,6 +77,9 @@ namespace Book_Clinic.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+
+
 
 
     }
