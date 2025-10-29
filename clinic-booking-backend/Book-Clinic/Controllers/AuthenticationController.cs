@@ -1,5 +1,6 @@
 ﻿using Book_Clinic.Authentication.DTOs;
 using Book_Clinic.Authentication.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,30 +19,30 @@ public class AuthenticationController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        try
-        {
-            var result = await _authService.RegisterUserAsync(request);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var result = await _authService.RegisterUserAsync(request);
+        return Ok(result);
     }
 
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        try
-        {
-            var result = await _authService.LoginUserAsync(request);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var result = await _authService.LoginUserAsync(request);
+        return Ok(result);
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        await _authService.LogoutUserAsync();
+        return Ok("Logged out successfully");
+    }
+
+    [HttpGet("secure")]
+    [Authorize]
+    public IActionResult Secure()
+    {
+        return Ok($"You are logged in as {User.Identity.Name}");
     }
 
 

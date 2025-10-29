@@ -13,15 +13,15 @@ public class AuthService : IAuthService
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration _configuration;
-    private readonly JwtTokenGenerator _jwtTokenGenerator;
+    private readonly SignInManager<User> _signInManager;
     private readonly ApplicationDbContext _context;
 
-    public AuthService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, JwtTokenGenerator jwtTokenGenerator, ApplicationDbContext context)
+    public AuthService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, SignInManager<User> signInManager, ApplicationDbContext context)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _configuration = configuration;
-        _jwtTokenGenerator = jwtTokenGenerator;
+        _signInManager = signInManager;
         _context = context;
     }
 
@@ -29,7 +29,6 @@ public class AuthService : IAuthService
     {
         var user = new User
         {
-            //UserId = request.UserId,
             UserName = request.UserName,
             Email = request.Email,
             CityId = request.CityId,
@@ -39,19 +38,24 @@ public class AuthService : IAuthService
 
         var result = await _userManager.CreateAsync(user, request.Password);
         if (!result.Succeeded)
-            throw new System.Exception("Registration failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+            throw new Exception("Registration failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
 
+        // Ensure role exists
         if (!await _roleManager.RoleExistsAsync(user.Role))
             await _roleManager.CreateAsync(new IdentityRole(user.Role));
 
         await _userManager.AddToRoleAsync(user, user.Role);
-        var token = await  _jwtTokenGenerator.GenerateToken(user);
+
+        // Auto sign-in user after registration
+        await _signInManager.SignInAsync(user, isPersistent: true);
+
         return new AuthResponse
         {
-            Token = token,
-            User = new { user.Id, user.UserName, user.Email, user.Role }
+            User = new { user.Id, user.UserName, user.Email, user.Role },
+            Message = "Registration successful"
         };
     }
+
 
     public async Task<AuthResponse> LoginUserAsync(LoginRequest request)
     {
@@ -59,27 +63,27 @@ public class AuthService : IAuthService
         if (user == null)
             throw new Exception("User not found with email: " + request.Email);
 
-        var passwordValid = await _userManager.CheckPasswordAsync(user, request.Password);
-        if (!passwordValid)
-            throw new Exception("Password incorrect for user: " + request.Email);
+        var result = await _signInManager.PasswordSignInAsync(
+            user,
+            request.Password,
+            isPersistent: true, // true → persistent cookie
+            lockoutOnFailure: false
+        );
 
-        var token = await _jwtTokenGenerator.GenerateToken(user);
+        if (!result.Succeeded)
+            throw new Exception("Invalid login credentials.");
+
+        // ✅ Cookie is automatically issued
         return new AuthResponse
         {
-            Token = token,
-            User = new { user.Id, user.UserName, user.Email, user.Role }
+            User = new { user.Id, user.UserName, user.Email, user.Role },
+            Message = "Login successful"
         };
     }
 
-
-    public Task<string> GetJwtKeyFromDbAsync()
+    public async Task LogoutUserAsync()
     {
-        var key = _context.JwtKeys
-           .Where(s => s.KeyName == "JwtKey")
-        .Select(s => s.Value)
-        .FirstOrDefaultAsync();
-
-        return key ?? throw new Exception("JWT key not found in database.");
+        await _signInManager.SignOutAsync(); // Deletes authentication cookie
     }
 
 

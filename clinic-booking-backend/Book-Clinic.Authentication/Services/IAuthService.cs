@@ -11,5 +11,7 @@ namespace Book_Clinic.Authentication.Services
     {
         Task<AuthResponse> RegisterUserAsync(RegisterRequest request);
         Task<AuthResponse> LoginUserAsync(LoginRequest request);
+
+        Task LogoutUserAsync();
     }
 }

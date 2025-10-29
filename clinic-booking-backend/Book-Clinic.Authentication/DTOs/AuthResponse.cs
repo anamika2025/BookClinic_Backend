@@ -10,5 +10,7 @@ namespace Book_Clinic.Authentication.DTOs
     {
         public string Token { get; set; }
         public object User { get; set; }
+
+        public string? Message { get; set; }
     }
 }

@@ -94,6 +94,16 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("PatientPolicy", policy => policy.RequireRole(Roles.Patient));
 });
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/api/authentication/login";
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.SlidingExpiration = true;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Use HTTPS
+});
+
 
 builder.Services.AddCors(options =>
 {
@@ -124,6 +134,8 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
